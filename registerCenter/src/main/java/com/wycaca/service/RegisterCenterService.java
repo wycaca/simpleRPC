@@ -81,13 +81,12 @@ public class RegisterCenterService {
             logger.info("注册中心启动成功, 端口号: {}", SystemConst.REGISTER_PORT);
             // 持续监听 服务 socket
             while (true) {
-                // todo 这边有问题
-                // 服务发现线程池
-                registerExecutor.execute(new ServiceRegisterTask(serverSocket.accept()));
-                logger.info("注册中心 服务发现线程池 已启动");
                 // 心跳检测线程池
-                keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveTask(), 1, SystemConst.SCAN_TIME, TimeUnit.SECONDS);
                 logger.info("注册中心 心跳检测线程池 已启动");
+                keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveTask(), SystemConst.SCAN_TIME, SystemConst.SCAN_TIME, TimeUnit.SECONDS);
+                // 服务发现线程池
+                logger.info("注册中心 服务发现线程池 已启动");
+                registerExecutor.execute(new ServiceRegisterTask(serverSocket.accept()));
             }
         } finally {
             serverSocket.close();

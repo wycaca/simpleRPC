@@ -11,7 +11,7 @@ public class NamedThreadPoolFactory implements ThreadFactory {
     private final AtomicInteger threadIndex = new AtomicInteger(0);
 
     // 线程名前缀
-    private String prefix;
+    private final String prefix;
 
     public NamedThreadPoolFactory(String prefix) {
         this.prefix = prefix;

@@ -1,12 +1,15 @@
 package com.wycaca.runable;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
+import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.service.RegisterCenterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class ServiceRegisterTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegisterTask.class);
@@ -23,37 +26,31 @@ public class ServiceRegisterTask implements Runnable {
         // 持续监听socket, 接受各种消息
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        BufferedReader reader = null;
-        BufferedWriter writer = null;
+        // kryo序列化
+        Input reader = null;
+        Output writer = null;
         String url = "";
+        Kryo kryo = new Kryo();
+        kryo.register(RegisterResponse.class);
         try {
             inputStream = socket.getInputStream();
             outputStream = socket.getOutputStream();
-            reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            writer = new BufferedWriter(new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+            reader = new Input(inputStream);
+            writer = new Output(outputStream);
             // BIO方式
             while (true) {
-                url = reader.readLine();
-                String str = registerCenterService.register(url);
-                writer.write(str);
-                writer.flush();
+                url = reader.readString();
+                RegisterResponse response = registerCenterService.register(url);
+                kryo.writeObject(writer, response);
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             if (reader != null) {
-                try {
-                    reader.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                reader.close();
             }
             if (writer != null) {
-                try {
-                    writer.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                writer.close();
             }
             if (inputStream != null) {
                 try {

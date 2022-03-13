@@ -3,6 +3,7 @@ package com.wycaca.service;
 import com.wycaca.constant.SystemConst;
 import com.wycaca.model.RegisterService;
 import com.wycaca.model.response.RegisterResponse;
+import com.wycaca.runable.KeepAliveTask;
 import com.wycaca.runable.ServiceRegisterTask;
 import com.wycaca.threadPoolFactory.NamedThreadPoolFactory;
 import org.slf4j.Logger;
@@ -13,17 +14,14 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class RegisterCenterService {
     private static final Logger logger = LoggerFactory.getLogger(RegisterCenterService.class);
 
     private static final ExecutorService registerExecutor = Executors.newFixedThreadPool(10, new NamedThreadPoolFactory("register"));
 
-    private static final ExecutorService keepAliveExecutor = Executors.newFixedThreadPool(10, new NamedThreadPoolFactory("keep_alive"));
+    private static final ScheduledExecutorService keepAliveExecutor = Executors.newScheduledThreadPool(2, new NamedThreadPoolFactory("keep_alive"));
 
     // 保存已注册的服务, <服务类路径, <服务注册url, 服务对象>>
     // com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService
@@ -83,8 +81,13 @@ public class RegisterCenterService {
             logger.info("注册中心启动成功, 端口号: {}", SystemConst.REGISTER_PORT);
             // 持续监听 服务 socket
             while (true) {
+                // todo 这边有问题
                 // 服务发现线程池
                 registerExecutor.execute(new ServiceRegisterTask(serverSocket.accept()));
+                logger.info("注册中心 服务发现线程池 已启动");
+                // 心跳检测线程池
+                keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveTask(), 1, SystemConst.SCAN_TIME, TimeUnit.SECONDS);
+                logger.info("注册中心 心跳检测线程池 已启动");
             }
         } finally {
             serverSocket.close();

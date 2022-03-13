@@ -3,7 +3,11 @@ package com.wycaca.runable;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
+import com.wycaca.constant.SystemConst;
 import com.wycaca.model.response.RegisterResponse;
+import com.wycaca.serializer.CommonSerializer;
+import com.wycaca.service.ConnectService;
+import com.wycaca.service.ConnectServiceFactory;
 import com.wycaca.service.RegisterCenterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,12 +17,14 @@ import java.net.Socket;
 
 public class ServiceRegisterTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegisterTask.class);
-    private final Socket socket;
     private final RegisterCenterService registerCenterService;
+    private final ConnectService connectService;
+    private final CommonSerializer commonSerializer;
 
     public ServiceRegisterTask(Socket socket) {
-        this.socket = socket;
         registerCenterService = new RegisterCenterService();
+        connectService = ConnectServiceFactory.get(socket);
+        commonSerializer = CommonSerializer.getSerializer(SystemConst.KRYO);
     }
 
     @Override
@@ -26,32 +32,20 @@ public class ServiceRegisterTask implements Runnable {
         // 持续监听socket, 接受各种消息
         InputStream inputStream = null;
         OutputStream outputStream = null;
-        // kryo序列化
-        Input reader = null;
-        Output writer = null;
         String url = "";
-        Kryo kryo = new Kryo();
-        kryo.register(RegisterResponse.class);
         try {
-            inputStream = socket.getInputStream();
-            outputStream = socket.getOutputStream();
-            reader = new Input(inputStream);
-            writer = new Output(outputStream);
+            inputStream = connectService.getInput();
+            outputStream = connectService.getOutPut();
             // BIO方式
             while (true) {
-                url = reader.readString();
+                byte[] bytes = new byte[inputStream.available()];
+                url = (String) commonSerializer.deserialize(bytes, String.class);
                 RegisterResponse response = registerCenterService.register(url);
-                kryo.writeObject(writer, response);
+                outputStream.write(commonSerializer.serialize(response));
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
-            if (reader != null) {
-                reader.close();
-            }
-            if (writer != null) {
-                writer.close();
-            }
             if (inputStream != null) {
                 try {
                     inputStream.close();

@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 
 public class ServiceRegisterTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegisterTask.class);
@@ -29,16 +30,23 @@ public class ServiceRegisterTask implements Runnable {
         // 持续监听socket, 接受各种消息
         InputStream inputStream = null;
         OutputStream outputStream = null;
+        ByteArrayOutputStream byteArrayOutputStream = null;
         String url = "";
         try {
             inputStream = connectService.getInput();
             outputStream = connectService.getOutPut();
+            byteArrayOutputStream = new ByteArrayOutputStream();
             // BIO方式
             while (true) {
-                byte[] bytes = new byte[inputStream.available()];
-                url = (String) commonSerializer.deserialize(bytes, String.class);
+                byte[] bytesBuffer = new byte[1024];
+                int len = -1;
+                while ((len = inputStream.read(bytesBuffer)) != -1) {
+                    byteArrayOutputStream.write(bytesBuffer, 0, len);
+                }
+                url = (String) commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
                 RegisterResponse response = registerCenterService.register(url);
                 outputStream.write(commonSerializer.serialize(response));
+                outputStream.flush();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -53,6 +61,13 @@ public class ServiceRegisterTask implements Runnable {
             if (outputStream != null) {
                 try {
                     outputStream.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (byteArrayOutputStream != null) {
+                try {
+                    byteArrayOutputStream.close();
                 } catch (IOException e) {
                     e.printStackTrace();
                 }

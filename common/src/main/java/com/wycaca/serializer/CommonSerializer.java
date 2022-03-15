@@ -1,6 +1,6 @@
 package com.wycaca.serializer;
 
-import com.wycaca.constant.SystemConst;
+import com.wycaca.constant.Const;
 
 public interface CommonSerializer {
     byte[] serialize(Object obj);
@@ -9,7 +9,7 @@ public interface CommonSerializer {
 
     static CommonSerializer getSerializer(String type) {
         switch (type) {
-            case SystemConst.KRYO:
+            case Const.KRYO:
                 return new KryoSerializer();
             default:
                 return new KryoSerializer();

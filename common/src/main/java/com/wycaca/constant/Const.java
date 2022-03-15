@@ -1,6 +1,6 @@
 package com.wycaca.constant;
 
-public interface SystemConst {
+public interface Const {
     /**
      * 注册中心端口
      */
@@ -20,5 +20,8 @@ public interface SystemConst {
     public static final String PROVIDER = "provider";
     public static final String CONSUMER = "consumer";
 
+    /**
+     * 序列化方式
+     */
     public static final String KRYO = "kryo";
 }

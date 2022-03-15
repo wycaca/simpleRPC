@@ -1,6 +1,6 @@
 package com.wycaca.runable;
 
-import com.wycaca.constant.SystemConst;
+import com.wycaca.constant.Const;
 import com.wycaca.model.RegisterService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +31,7 @@ public class KeepAliveTask implements Runnable {
             String key = entry.getKey();
             RegisterService service = entry.getValue();
             long mergeTime = service.getLastPingTimestamp() - now;
-            if (mergeTime > SystemConst.TIMEOUT) {
+            if (mergeTime > Const.TIMEOUT) {
                 serviceMap.remove(key);
                 logger.info("{} 服务超时, 已移除", service.getRegisterUrl());
             }

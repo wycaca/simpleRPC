@@ -1,6 +1,6 @@
 package com.wycaca.model;
 
-import com.wycaca.constant.SystemConst;
+import com.wycaca.constant.Const;
 import lombok.Data;
 
 import java.net.URL;
@@ -32,7 +32,7 @@ public class RegisterService {
         this.registerUrl = registerUrl;
         URL url = new URL(registerUrl);
         String protocol = url.getProtocol();
-        if (SystemConst.PROVIDER.equals(protocol) || SystemConst.CONSUMER.equals(protocol)) {
+        if (Const.PROVIDER.equals(protocol) || Const.CONSUMER.equals(protocol)) {
             this.type = protocol;
         } else {
             throw new IllegalArgumentException("注册服务类型错误");

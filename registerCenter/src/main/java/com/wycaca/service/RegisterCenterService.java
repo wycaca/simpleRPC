@@ -1,6 +1,6 @@
 package com.wycaca.service;
 
-import com.wycaca.constant.SystemConst;
+import com.wycaca.constant.Const;
 import com.wycaca.model.RegisterService;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.runable.KeepAliveTask;
@@ -42,7 +42,7 @@ public class RegisterCenterService {
         }
         // 区分提供者, 消费者
         // 如果是提供者加入注册服务
-        if (SystemConst.PROVIDER.equals(registerService.getType())) {
+        if (Const.PROVIDER.equals(registerService.getType())) {
             // 已存在, 则更新 心跳时间
             if (providerPathMap.containsKey(registerService.getPath())) {
                 registerService = providerPathMap.get(registerService.getPath()).get(registerService.getRegisterUrl());
@@ -54,7 +54,7 @@ public class RegisterCenterService {
             return RegisterResponse.ok();
         }
         // 如果是消费者, 查找提供者
-        else if (SystemConst.CONSUMER.equals(registerService.getType())) {
+        else if (Const.CONSUMER.equals(registerService.getType())) {
             // 如果有对应的提供者, 返回socket连接信息, 使提供者和消费者直接建立连接
             if (consumerPathMap.containsKey(registerService.getPath())) {
                 // 选择一个生产者, 目前直接find any, 随机?
@@ -76,14 +76,14 @@ public class RegisterCenterService {
 
     public void start() throws IOException {
         ServerSocket serverSocket = new ServerSocket();
-        serverSocket.bind(new InetSocketAddress(SystemConst.REGISTER_PORT));
+        serverSocket.bind(new InetSocketAddress(Const.REGISTER_PORT));
         try {
-            logger.info("注册中心启动成功, 端口号: {}", SystemConst.REGISTER_PORT);
+            logger.info("注册中心启动成功, 端口号: {}", Const.REGISTER_PORT);
             // 持续监听 服务 socket
             while (true) {
                 // 心跳检测线程池
                 logger.info("注册中心 心跳检测线程池 已启动");
-                keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveTask(), SystemConst.SCAN_TIME, SystemConst.SCAN_TIME, TimeUnit.SECONDS);
+                keepAliveExecutor.scheduleWithFixedDelay(new KeepAliveTask(), Const.SCAN_TIME, Const.SCAN_TIME, TimeUnit.SECONDS);
                 // 服务发现线程池
                 logger.info("注册中心 服务发现线程池 已启动");
                 registerExecutor.execute(new ServiceRegisterTask(serverSocket.accept()));

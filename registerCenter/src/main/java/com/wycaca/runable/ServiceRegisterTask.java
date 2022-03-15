@@ -1,9 +1,6 @@
 package com.wycaca.runable;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
-import com.esotericsoftware.kryo.io.Output;
-import com.wycaca.constant.SystemConst;
+import com.wycaca.constant.Const;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.serializer.CommonSerializer;
 import com.wycaca.service.ConnectService;
@@ -24,7 +21,7 @@ public class ServiceRegisterTask implements Runnable {
     public ServiceRegisterTask(Socket socket) {
         registerCenterService = new RegisterCenterService();
         connectService = ConnectServiceFactory.get(socket);
-        commonSerializer = CommonSerializer.getSerializer(SystemConst.KRYO);
+        commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
     }
 
     @Override

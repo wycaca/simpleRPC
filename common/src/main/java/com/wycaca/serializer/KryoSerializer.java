@@ -7,13 +7,15 @@ import com.wycaca.model.response.RegisterResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+
 public class KryoSerializer implements CommonSerializer {
     private static final Logger logger = LoggerFactory.getLogger(KryoSerializer.class);
 
     private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.register(RegisterResponse.class);
-        kryo.setReferences(true);
         return kryo;
     });
 
@@ -32,16 +34,26 @@ public class KryoSerializer implements CommonSerializer {
     @Override
     public byte[] serialize(Object obj) {
         Kryo kryo = getKryo();
-        Output output = new Output();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        Output output = new Output(byteArrayOutputStream);
         kryo.writeObject(output, obj);
-        return output.toBytes();
+        output.flush();
+        return byteArrayOutputStream.toByteArray();
     }
 
     @Override
     public Object deserialize(byte[] bytes, Class<?> clazz) {
         Kryo kryo = getKryo();
-        Input input = new Input();
-        input.read(bytes);
+        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
+        Input input = new Input(byteArrayInputStream);
         return kryo.readObject(input, clazz);
     }
+
+//    public static void main(String[] args) {
+//        KryoSerializer kryoSerializer = new KryoSerializer();
+//        String test = "test";
+//        byte[] bytes = null;
+//        bytes = kryoSerializer.serialize(test);
+//        System.out.println(kryoSerializer.deserialize(bytes, String.class));
+//    }
 }

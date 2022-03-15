@@ -24,4 +24,9 @@ public interface Const {
      * 序列化方式
      */
     public static final String KRYO = "kryo";
+
+    /**
+     * URL 参数中的Key
+     */
+    public static final String PARAMS_timestamp = "timestamp";
 }

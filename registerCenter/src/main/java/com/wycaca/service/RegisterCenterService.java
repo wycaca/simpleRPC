@@ -1,6 +1,8 @@
 package com.wycaca.service;
 
 import com.wycaca.constant.Const;
+import com.wycaca.load.LoadSelector;
+import com.wycaca.load.impl.RandomSelector;
 import com.wycaca.model.RegisterService;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.runable.KeepAliveTask;
@@ -32,6 +34,9 @@ public class RegisterCenterService {
     // consumer://10.10.6.145/com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService?application=cti-link-agent-gateway&application.version=0.0.1&category=consumers&check=false&default.check=false&default.version=0.0.1&dubbo=2.8.4&interface=com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService&methods=pauseTask,start,listAgentTask,pause&pid=30269&revision=0.0.1&side=consumer&timestamp=1646892725284
     private static final ConcurrentMap<String, RegisterService> consumerMap = new ConcurrentHashMap<>();
 
+    // 负载均衡选择器, 默认随机
+    private final LoadSelector loadSelector = new RandomSelector();
+
     public RegisterResponse register(String url) {
         RegisterService registerService = null;
         try {
@@ -58,8 +63,8 @@ public class RegisterCenterService {
             // 如果有对应的提供者, 返回socket连接信息, 使提供者和消费者直接建立连接
             if (consumerPathMap.containsKey(registerService.getPath())) {
                 // 选择一个生产者, 目前直接find any, 随机?
-                // todo 负载均衡策略
-                RegisterService providerService = providerPathMap.get(registerService.getPath()).values().stream().findAny().get();
+                // todo 完善负载均衡策略
+                RegisterService providerService = loadSelector.select(providerPathMap.get(registerService.getPath()));
                 // 注册消费者
                 consumerMap.put(registerService.getRegisterUrl(), registerService);
                 consumerPathMap.put(registerService.getPath(), consumerMap);

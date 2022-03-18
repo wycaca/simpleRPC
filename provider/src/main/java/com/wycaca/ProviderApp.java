@@ -11,8 +11,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-public class App {
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+public class ProviderApp {
+    private static final Logger logger = LoggerFactory.getLogger(ProviderApp.class);
 
     public static void main(String[] args) {
         try {

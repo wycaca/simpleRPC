@@ -28,8 +28,8 @@ public class URL implements Serializable {
         file = str[1];
     }
 
-    public static void main(String[] args) {
-        URL url = new URL("consumer://10.10.6.145:9999/com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService?application=cti-link-agent-gateway&application.version=0.0.1&category=consumers&check=false&default.check=false&default.version=0.0.1&dubbo=2.8.4&interface=com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService&methods=pauseTask,start,listAgentTask,pause&pid=30269&revision=0.0.1&side=consumer&timestamp=1646892725284");
-        System.out.println(url);
-    }
+//    public static void main(String[] args) {
+//        URL url = new URL("consumer://10.10.6.145:9999/com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService?application=cti-link-agent-gateway&application.version=0.0.1&category=consumers&check=false&default.check=false&default.version=0.0.1&dubbo=2.8.4&interface=com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService&methods=pauseTask,start,listAgentTask,pause&pid=30269&revision=0.0.1&side=consumer&timestamp=1646892725284");
+//        System.out.println(url);
+//    }
 }

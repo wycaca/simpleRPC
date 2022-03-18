@@ -25,16 +25,23 @@ public class RegisterCenterService {
 
     private static final ScheduledExecutorService keepAliveExecutor = Executors.newScheduledThreadPool(2, new NamedThreadPoolFactory("keep_alive"));
 
-    // 保存已注册的服务, <服务类路径, <服务注册url, 服务对象>>
-    // com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService
+    /**
+     * 保存已注册的提供者服务, <服务类路径, <服务注册url, 服务对象>>
+     * com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService
+     */
     private static final ConcurrentMap<String, ConcurrentMap<String, RegisterService>> providerPathMap = new ConcurrentHashMap<>();
     private static final ConcurrentMap<String, RegisterService> providerMap = new ConcurrentHashMap<>();
 
+    /**
+     * 已注册的消费者服务
+     * consumer://10.10.6.145/com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService?application=cti-link-agent-gateway&application.version=0.0.1&category=consumers&check=false&default.check=false&default.version=0.0.1&dubbo=2.8.4&interface=com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService&methods=pauseTask,start,listAgentTask,pause&pid=30269&revision=0.0.1&side=consumer&timestamp=1646892725284
+     */
     private static final ConcurrentMap<String, Map<String, RegisterService>> consumerPathMap = new ConcurrentHashMap<>();
-    // consumer://10.10.6.145/com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService?application=cti-link-agent-gateway&application.version=0.0.1&category=consumers&check=false&default.check=false&default.version=0.0.1&dubbo=2.8.4&interface=com.tinet.ctilink.agent.service.AgentOutcallScheduleTaskService&methods=pauseTask,start,listAgentTask,pause&pid=30269&revision=0.0.1&side=consumer&timestamp=1646892725284
     private static final ConcurrentMap<String, RegisterService> consumerMap = new ConcurrentHashMap<>();
 
-    // 负载均衡选择器, 默认随机
+    /**
+     * 负载均衡选择器, 默认随机
+     */
     private final LoadSelector loadSelector = new RandomSelector();
 
     public RegisterResponse register(String url) {
@@ -95,15 +102,6 @@ public class RegisterCenterService {
             }
         } finally {
             serverSocket.close();
-        }
-    }
-
-    public static void main(String[] args) {
-        RegisterCenterService registerCenterService = new RegisterCenterService();
-        try {
-            registerCenterService.start();
-        } catch (IOException e) {
-            logger.error("注册中心异常: ", e);
         }
     }
 }

@@ -5,15 +5,19 @@ import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.runable.WorkTask;
 import com.wycaca.service.ConnectServiceFactory;
 import com.wycaca.threadPoolFactory.NamedThreadPoolFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ProviderService extends RegisterService {
+    private static final Logger logger = LoggerFactory.getLogger(ProviderService.class);
 
     private static final ExecutorService workExecutor = Executors.newFixedThreadPool(10, new NamedThreadPoolFactory("work"));
 
@@ -36,20 +40,23 @@ public class ProviderService extends RegisterService {
         outputStream.close();
         registerCenterSocket.close();
         // 生产者, 需要建立socket服务端, 供消费者连接
-        creatServerSocket(this.port);
+        start(this.port);
         return RegisterResponse.ok();
     }
 
     /**
      * 生产者, 建立socket服务端
+     *
      * @param port 端口号
      * @return
      */
-    private ServerSocket creatServerSocket(int port) throws IOException {
-        ServerSocket serverSocket = new ServerSocket(this.port);
+    private ServerSocket start(int port) throws IOException {
+        ServerSocket serverSocket = new ServerSocket();
+        serverSocket.bind(new InetSocketAddress(port));
         // 开始监听
         serverSocket.accept();
         while (true) {
+            logger.info("服务{} 生产者启动成功, 端口号: {}", this.name, port);
             // todo 获取方法名和入参
             String method = "";
             Object param = null;

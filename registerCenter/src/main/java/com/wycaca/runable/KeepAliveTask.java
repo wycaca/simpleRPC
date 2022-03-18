@@ -12,16 +12,20 @@ import java.util.concurrent.ConcurrentMap;
 
 public class KeepAliveTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(KeepAliveTask.class);
-    // 提供者
-    private static final ConcurrentMap<String, RegisterService> providerMap = new ConcurrentHashMap<>();
-    // 消费者
-    private static final ConcurrentMap<String, RegisterService> consumerMap = new ConcurrentHashMap<>();
+    /**
+     * 提供者
+     */
+    private static final ConcurrentMap<String, RegisterService> PROVIDER_MAP = new ConcurrentHashMap<>();
+    /**
+     * 消费者
+     */
+    private static final ConcurrentMap<String, RegisterService> CONSUMER_MAP = new ConcurrentHashMap<>();
 
     @Override
     public void run() {
         logger.info("开始检测是否存在心跳异常服务");
-        removeService(providerMap);
-        removeService(consumerMap);
+        removeService(PROVIDER_MAP);
+        removeService(CONSUMER_MAP);
     }
 
     private void removeService(ConcurrentMap<String, RegisterService> serviceMap) {

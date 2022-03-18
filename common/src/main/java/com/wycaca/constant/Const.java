@@ -7,15 +7,15 @@ public interface Const {
     public static final int REGISTER_PORT = 8300;
 
     /**
-     * 超时时间, 默认30s
+     * 超时时间, 默认10s
      */
 
-    public static final long TIMEOUT = 30 * 60 * 1000;
+    public static final long TIMEOUT = 10 * 60 * 1000;
 
     /**
-     * 检测超时间隔时间, 默认60s
+     * 检测超时间隔时间, 默认30s
      */
-    public static final long SCAN_TIME = 60;
+    public static final long SCAN_TIME = 30;
 
     public static final String PROVIDER = "provider";
     public static final String CONSUMER = "consumer";
@@ -28,5 +28,5 @@ public interface Const {
     /**
      * URL 参数中的Key
      */
-    public static final String PARAMS_timestamp = "timestamp";
+    public static final String PARAMS_TIMESTAMP = "timestamp";
 }

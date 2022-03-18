@@ -34,7 +34,7 @@ public class ProviderService extends RegisterService {
         connectService = ConnectServiceFactory.get(registerCenterSocket);
         OutputStream outputStream = connectService.getOutPut();
         String url = this.type + "://" + this.ip + ":" + this.port + "/" + this.path
-                + "?" + Const.PARAMS_timestamp + System.currentTimeMillis();
+                + "?" + Const.PARAMS_TIMESTAMP + System.currentTimeMillis();
         outputStream.write(commonSerializer.serialize(url));
         outputStream.flush();
         outputStream.close();

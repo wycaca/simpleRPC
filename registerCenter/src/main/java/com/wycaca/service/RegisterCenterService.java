@@ -69,7 +69,7 @@ public class RegisterCenterService {
         // 如果是消费者, 查找提供者
         else if (Const.CONSUMER.equals(registerService.getUrl().getProtocol())) {
             // 如果有对应的提供者, 返回socket连接信息, 使提供者和消费者直接建立连接
-            if (CONSUMER_PATH_MAP.containsKey(registerService.getUrl().getPath())) {
+            if (PROVIDER_PATH_MAP.containsKey(registerService.getUrl().getPath())) {
                 // 选择一个生产者, 目前直接随机
                 // todo 完善负载均衡策略
                 RegisterService providerService = loadSelector.select(PROVIDER_PATH_MAP.get(registerService.getUrl().getPath()));

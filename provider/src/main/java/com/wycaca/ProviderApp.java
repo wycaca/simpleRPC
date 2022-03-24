@@ -1,7 +1,7 @@
 package com.wycaca;
 
 import com.wycaca.constant.Const;
-import com.wycaca.demo.ProviderServiceDemo;
+import com.wycaca.demo.ServiceDemo;
 import com.wycaca.model.ProviderService;
 import com.wycaca.model.response.RegisterResponse;
 import org.slf4j.Logger;
@@ -14,7 +14,7 @@ public class ProviderApp {
 
     public static void main(String[] args) {
         try {
-            ProviderService provideService = new ProviderService(8100, ProviderServiceDemo.class);
+            ProviderService provideService = new ProviderService(8100, ServiceDemo.class);
             // 注册
             RegisterResponse response = provideService.doRegister("127.0.0.1", Const.REGISTER_PORT);
             if (response.isOk()) {

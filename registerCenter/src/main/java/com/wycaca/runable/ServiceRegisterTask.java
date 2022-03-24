@@ -36,13 +36,11 @@ public class ServiceRegisterTask implements Runnable {
              OutputStream outputStream = connectService.getOutPut();
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ) {
+            byte[] bytesBuffer = new byte[1024];
+            int len = -1;
             // BIO方式
-            while (true) {
-                byte[] bytesBuffer = new byte[1024];
-                int len = -1;
-                while ((len = inputStream.read(bytesBuffer)) != -1) {
-                    byteArrayOutputStream.write(bytesBuffer, 0, len);
-                }
+            while ((len = inputStream.read(bytesBuffer)) != -1) {
+                byteArrayOutputStream.write(bytesBuffer, 0, len);
                 // 反序列 注册url
                 url = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
                 RegisterResponse response = registerCenterService.register(url);

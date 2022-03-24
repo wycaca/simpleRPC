@@ -2,15 +2,10 @@ package com.wycaca.model;
 
 import com.wycaca.constant.Const;
 import com.wycaca.serializer.CommonSerializer;
-import com.wycaca.service.ConnectService;
-import com.wycaca.service.ConnectServiceFactory;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.Socket;
-import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -28,21 +23,20 @@ public class RegisterService {
      */
     protected String type;
     protected String path;
-    protected List<String> methods;
     protected String ip;
     protected Integer port;
     protected Long registerTimestamp;
     protected Long lastPingTimestamp;
+    protected String url;
 
-    protected Socket socket;
-    protected ConnectService connectService;
     protected CommonSerializer commonSerializer;
 
     public RegisterService(int port) throws IOException {
         // 获取本机IP
-        this.ip = InetAddress.getLocalHost().getHostAddress();
+//        this.ip = InetAddress.getLocalHost().getHostAddress();
+        // Demo, 先写死
+        this.ip = "127.0.0.1";
         this.port = port;
-        connectService = ConnectServiceFactory.get(this.socket);
         commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
     }
 

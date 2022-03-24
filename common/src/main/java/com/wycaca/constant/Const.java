@@ -29,4 +29,5 @@ public interface Const {
      * URL 参数中的Key
      */
     public static final String PARAMS_TIMESTAMP = "timestamp";
+    public static final String PARAMS_METHODS = "methods";
 }

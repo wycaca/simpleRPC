@@ -3,25 +3,28 @@ package com.wycaca.runable;
 import com.wycaca.constant.Const;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.serializer.CommonSerializer;
-import com.wycaca.service.ConnectService;
-import com.wycaca.service.ConnectServiceFactory;
+import com.wycaca.service.ConnectFactory;
 import com.wycaca.service.RegisterCenterService;
+import com.wycaca.service.impl.SocketImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 
 public class ServiceRegisterTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegisterTask.class);
     private final RegisterCenterService registerCenterService;
-    private final ConnectService connectService;
+    private final ConnectFactory connectService;
     private final CommonSerializer commonSerializer;
 
-    public ServiceRegisterTask(Socket socket) {
+    public ServiceRegisterTask(Socket socket) throws IOException {
         registerCenterService = new RegisterCenterService();
-        connectService = ConnectServiceFactory.get(socket);
+        // 连接上提供者的Socket服务器
+        connectService = new SocketImpl(socket);
         commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
     }
 

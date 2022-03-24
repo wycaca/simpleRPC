@@ -1,16 +1,16 @@
 package com.wycaca.service.impl;
 
-import com.wycaca.service.ConnectService;
+import com.wycaca.service.ConnectFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
-public class SocketServiceImpl extends ConnectService {
+public class SocketImpl implements ConnectFactory {
     private final Socket socket;
 
-    public SocketServiceImpl(Socket socket) {
+    public SocketImpl(Socket socket) throws IOException {
         super();
         this.socket = socket;
     }

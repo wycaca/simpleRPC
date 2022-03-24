@@ -41,6 +41,6 @@ public class ConsumerService extends RegisterService {
         // 如果是消费者, 需要接受返回信息
         InputStream inputStream = connectFactory.getInput();
         byte[] bytes = new byte[inputStream.available()];
-        return (RegisterResponse) commonSerializer.deserialize(bytes, RegisterResponse.class);
+        return commonSerializer.deserialize(bytes, RegisterResponse.class);
     }
 }

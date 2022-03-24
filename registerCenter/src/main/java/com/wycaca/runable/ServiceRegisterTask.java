@@ -46,7 +46,7 @@ public class ServiceRegisterTask implements Runnable {
                 while ((len = inputStream.read(bytesBuffer)) != -1) {
                     byteArrayOutputStream.write(bytesBuffer, 0, len);
                 }
-                url = (String) commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
+                url = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
                 RegisterResponse response = registerCenterService.register(url);
                 outputStream.write(commonSerializer.serialize(response));
                 outputStream.flush();

@@ -5,7 +5,7 @@ import com.wycaca.constant.Const;
 public interface CommonSerializer {
     byte[] serialize(Object obj);
 
-    Object deserialize(byte[] bytes, Class<?> clazz);
+    <T> T deserialize(byte[] bytes, Class<?> clazz);
 
     static CommonSerializer getSerializer(String type) {
         switch (type) {

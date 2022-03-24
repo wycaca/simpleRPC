@@ -42,11 +42,11 @@ public class KryoSerializer implements CommonSerializer {
     }
 
     @Override
-    public Object deserialize(byte[] bytes, Class<?> clazz) {
+    public <T> T deserialize(byte[] bytes, Class<?> clazz) {
         Kryo kryo = getKryo();
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(bytes);
         Input input = new Input(byteArrayInputStream);
-        return kryo.readObject(input, clazz);
+        return (T) kryo.readObject(input, clazz);
     }
 
 //    public static void main(String[] args) {

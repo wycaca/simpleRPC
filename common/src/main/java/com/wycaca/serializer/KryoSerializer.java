@@ -4,6 +4,7 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.wycaca.model.response.RegisterResponse;
+import com.wycaca.proxy.model.RpcInvoke;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +17,7 @@ public class KryoSerializer implements CommonSerializer {
     private static final ThreadLocal<Kryo> kryoThreadLocal = ThreadLocal.withInitial(() -> {
         Kryo kryo = new Kryo();
         kryo.register(RegisterResponse.class);
+        kryo.register(RpcInvoke.class);
         return kryo;
     });
 

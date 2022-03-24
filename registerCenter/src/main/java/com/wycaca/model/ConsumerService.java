@@ -63,6 +63,9 @@ public class ConsumerService extends RegisterService {
                     String data = (String) response.getData();
                     doSubscribe(data.split(":")[0], Integer.parseInt(data.split(":")[1]));
                     return RegisterResponse.ok();
+                } else {
+                    logger.error("消费者注册失败, {}", response.getMessage());
+                    return response;
                 }
             }
         } catch (IOException e) {

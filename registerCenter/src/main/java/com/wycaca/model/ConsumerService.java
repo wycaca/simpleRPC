@@ -17,6 +17,8 @@ public class ConsumerService extends RegisterService {
     public ConsumerService(int port) throws IOException {
         super(port);
         this.type = Const.CONSUMER;
+        this.url = this.type + "://" + this.ip + ":" + this.port + "/" + this.path
+                + "?" + Const.PARAMS_TIMESTAMP + "=" + System.currentTimeMillis();
     }
 
     /**
@@ -33,8 +35,6 @@ public class ConsumerService extends RegisterService {
         // 开启客户端, 连接注册中心的服务器Socket
         ConnectFactory connectFactory = new SocketImpl(new Socket(registerIp, registerPort));
         OutputStream outputStream = connectFactory.getOutPut();
-        String url = this.type + "://" + this.ip + ":" + this.port + "/" + this.path
-                + "?" + Const.PARAMS_TIMESTAMP + "=" + System.currentTimeMillis();
         outputStream.write(commonSerializer.serialize(url));
         outputStream.flush();
         outputStream.close();

@@ -7,6 +7,9 @@ import com.wycaca.service.ConnectFactory;
 import com.wycaca.service.impl.SocketImpl;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -15,6 +18,7 @@ import java.net.Socket;
 @Data
 @NoArgsConstructor
 public class RegisterService {
+    private Logger logger = LoggerFactory.getLogger(RegisterService.class);
     /**
      * 注册url
      * 参照dubbo
@@ -48,14 +52,37 @@ public class RegisterService {
     /**
      * 向注册中心发送注册连接
      */
-    public RegisterResponse doRegister(String registerIp, int registerPort) throws IOException {
+    public RegisterResponse doRegister(String registerIp, int registerPort) {
         // 开启客户端, 连接注册中心的服务器Socket
-        ConnectFactory connectFactory = new SocketImpl(new Socket(registerIp, registerPort));
-        OutputStream outputStream = connectFactory.getOutPut();
-        // 向注册中心发送注册Url
-        outputStream.write(commonSerializer.serialize(getRegisterUrl()));
-        outputStream.flush();
-        outputStream.close();
+        ConnectFactory connectFactory = null;
+
+        try {
+            connectFactory = new SocketImpl(new Socket(registerIp, registerPort));
+        } catch (IOException e) {
+            logger.error("连接注册中心失败, ", e);
+            return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "连接注册中心失败");
+        }
+
+        try (OutputStream outputStream = connectFactory.getOutPut();
+//             InputStream inputStream = null;
+//             ByteArrayOutputStream byteArrayOutputStream = null;
+        ) {
+            // 向注册中心发送注册Url
+            outputStream.write(commonSerializer.serialize(getRegisterUrl()));
+            outputStream.flush();
+
+//            // 收到正确返回, 返回成功
+//            inputStream = connectFactory.getInput();
+//            byteArrayOutputStream = new ByteArrayOutputStream();
+//            byte[] bytesBuffer = new byte[1024];
+//            int len = -1;
+//            while ((len = inputStream.read(bytesBuffer)) != -1) {
+//                byteArrayOutputStream.write(bytesBuffer, 0, len);
+//            }
+        } catch (IOException e) {
+            logger.error("向注册中心注册失败, ", e);
+        }
+//        RegisterResponse result = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), RegisterResponse.class);
         return RegisterResponse.ok();
     }
 

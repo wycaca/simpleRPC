@@ -58,10 +58,14 @@ public class ProviderService extends RegisterService {
      * 向注册中心发送注册连接
      */
     @Override
-    public RegisterResponse doRegister(String registerIp, int registerPort) throws IOException {
+    public RegisterResponse doRegister(String registerIp, int registerPort) {
         super.doRegister(registerIp, registerPort);
         // 生产者, 需要建立socket服务端, 供消费者连接
-        start(this.url.getPort());
+        try {
+            start(this.url.getPort());
+        } catch (IOException e) {
+            logger.error("启动提供者失败, ", e);
+        }
         return RegisterResponse.ok();
     }
 

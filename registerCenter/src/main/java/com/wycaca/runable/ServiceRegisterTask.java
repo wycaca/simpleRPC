@@ -31,14 +31,11 @@ public class ServiceRegisterTask implements Runnable {
     @Override
     public void run() {
         // 持续监听socket, 接受各种消息
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-        ByteArrayOutputStream byteArrayOutputStream = null;
         String url = "";
-        try {
-            inputStream = connectService.getInput();
-            outputStream = connectService.getOutPut();
-            byteArrayOutputStream = new ByteArrayOutputStream();
+        try (InputStream inputStream = connectService.getInput();
+             OutputStream outputStream = connectService.getOutPut();
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        ) {
             // BIO方式
             while (true) {
                 byte[] bytesBuffer = new byte[1024];
@@ -52,29 +49,7 @@ public class ServiceRegisterTask implements Runnable {
                 outputStream.flush();
             }
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            if (byteArrayOutputStream != null) {
-                try {
-                    byteArrayOutputStream.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            logger.error("注册中心注册服务失败, ", e);
         }
     }
 }

@@ -3,6 +3,7 @@ package com.wycaca;
 import com.wycaca.constant.Const;
 import com.wycaca.demo.ProviderServiceDemo;
 import com.wycaca.model.ProviderService;
+import com.wycaca.model.response.RegisterResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -15,7 +16,12 @@ public class ProviderApp {
         try {
             ProviderService provideService = new ProviderService(8100, ProviderServiceDemo.class);
             // 注册
-            provideService.doRegister("127.0.0.1", Const.REGISTER_PORT);
+            RegisterResponse response = provideService.doRegister("127.0.0.1", Const.REGISTER_PORT);
+            if (response.isOk()) {
+                logger.info("注册成功");
+            } else {
+                logger.error("注册失败, 错误码: {},{}", response.getCode(), response.getMessage());
+            }
         } catch (IOException e) {
             logger.error("生产者服务异常, ", e);
         }

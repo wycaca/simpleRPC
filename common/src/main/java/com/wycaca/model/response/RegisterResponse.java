@@ -5,6 +5,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor
@@ -18,12 +19,16 @@ public class RegisterResponse implements Serializable {
         this.message = msg;
     }
 
+    public boolean isOk() {
+        return Objects.equals(code, HttpStatus.OK.value());
+    }
+
     public static RegisterResponse fail(Integer code, String msg) {
         return new RegisterResponse(code, msg);
     }
 
     public static RegisterResponse ok() {
-        RegisterResponse registerResponse  = new RegisterResponse();
+        RegisterResponse registerResponse = new RegisterResponse();
         registerResponse.code = HttpStatus.OK.value();
         return registerResponse;
     }

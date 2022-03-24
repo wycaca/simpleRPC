@@ -43,7 +43,7 @@ public class ServiceRegisterTask implements Runnable {
                 // 反序列 注册url
                 url = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
                 RegisterResponse response = registerCenterService.register(url);
-                // 返回消息
+                // todo 返回消息, 报错 Software caused connection abort: recv failed
                 outputStream.write(commonSerializer.serialize(response));
                 outputStream.flush();
             }

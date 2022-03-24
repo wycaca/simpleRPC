@@ -60,6 +60,11 @@ public class ProviderService extends RegisterService {
     @Override
     public RegisterResponse doRegister(String registerIp, int registerPort) {
         super.doRegister(registerIp, registerPort);
+        try {
+            this.registerSocket.close();
+        } catch (IOException e) {
+            logger.error("关闭 提供者 注册 客户端失败, ", e);
+        }
         // 生产者, 需要建立socket服务端, 供消费者连接
         try {
             start(this.url.getPort());

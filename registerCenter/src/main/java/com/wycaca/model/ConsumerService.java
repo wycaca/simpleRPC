@@ -37,14 +37,14 @@ public class ConsumerService extends RegisterService {
         ConnectFactory connectService = null;
         RegisterResponse response = new RegisterResponse();
         connectService = new SocketFactory(registerSocket);
-        try (InputStream inputStream = connectService.getSocket().getInputStream();
-             OutputStream outputStream = connectService.getSocket().getOutputStream();
+        try (InputStream inputStream = connectService.getInput();
+             OutputStream outputStream = connectService.getOutPut();
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ) {
             byte[] bytesBuffer = new byte[1024];
             int len = -1;
             // BIO方式
-            while ((len = inputStream.read(bytesBuffer)) > 0) {
+            while ((len = inputStream.read(bytesBuffer)) != -1) {
                 byteArrayOutputStream.write(bytesBuffer, 0, len);
                 // 反序列 注册url
                 response = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), RegisterResponse.class);

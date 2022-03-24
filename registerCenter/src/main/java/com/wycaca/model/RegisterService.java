@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -65,22 +66,20 @@ public class RegisterService {
             return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "连接注册中心失败");
         }
 
-        try (InputStream inputStream = connectService.getSocket().getInputStream();
-             OutputStream outputStream = connectService.getSocket().getOutputStream();
-//             ByteArrayOutputStream byteArrayOutputStream = null;
+        try (InputStream inputStream = connectService.getInput();
+             OutputStream outputStream = connectService.getOutPut();
+             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ) {
             // 向注册中心发送注册Url
             outputStream.write(commonSerializer.serialize(getRegisterUrl()));
             outputStream.flush();
 
-//            // 收到正确返回, 返回成功
-//            inputStream = connectFactory.getInput();
-//            byteArrayOutputStream = new ByteArrayOutputStream();
-//            byte[] bytesBuffer = new byte[1024];
-//            int len = -1;
-//            while ((len = inputStream.read(bytesBuffer)) != -1) {
-//                byteArrayOutputStream.write(bytesBuffer, 0, len);
-//            }
+            // 收到正确返回, 返回成功
+            byte[] bytesBuffer = new byte[1024];
+            int len = -1;
+            while ((len = inputStream.read(bytesBuffer)) != -1) {
+                byteArrayOutputStream.write(bytesBuffer, 0, len);
+            }
         } catch (IOException e) {
             logger.error("向注册中心注册失败, ", e);
         }

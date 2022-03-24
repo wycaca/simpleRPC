@@ -1,5 +1,7 @@
 package com.wycaca.runable;
 
+import com.wycaca.connect.ConnectFactory;
+import com.wycaca.connect.impl.SocketFactory;
 import com.wycaca.constant.Const;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.serializer.CommonSerializer;
@@ -16,14 +18,13 @@ import java.net.Socket;
 public class ServiceRegisterTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegisterTask.class);
     private final RegisterCenterService registerCenterService;
-    private Socket socket;
+    private final ConnectFactory connectService;
     private final CommonSerializer commonSerializer;
 
     public ServiceRegisterTask(RegisterCenterService registerCenterService, Socket socket) throws IOException {
         this.registerCenterService = registerCenterService;
         // 获取连接服务, 接受消息
-//        connectService = new SocketFactory(socket);
-        socket = socket;
+        connectService = new SocketFactory(socket);
         commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
     }
 
@@ -31,14 +32,14 @@ public class ServiceRegisterTask implements Runnable {
     public void run() {
         // 持续监听socket, 接受注册消息
         String url = "";
-        try (InputStream inputStream = socket.getInputStream();
-             OutputStream outputStream = socket.getOutputStream();
+        try (InputStream inputStream = connectService.getInput();
+             OutputStream outputStream = connectService.getOutPut();
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ) {
             byte[] bytesBuffer = new byte[1024];
             int len = -1;
             // BIO方式
-            while ((len = inputStream.read(bytesBuffer)) > 0) {
+            while ((len = inputStream.read(bytesBuffer)) != -1) {
                 byteArrayOutputStream.write(bytesBuffer, 0, len);
                 // 反序列 注册url
                 url = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);

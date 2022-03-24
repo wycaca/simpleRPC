@@ -5,7 +5,6 @@ import com.wycaca.load.LoadSelector;
 import com.wycaca.load.impl.RandomSelector;
 import com.wycaca.model.RegisterService;
 import com.wycaca.model.response.RegisterResponse;
-import com.wycaca.runable.KeepAliveTask;
 import com.wycaca.runable.ServiceRegisterTask;
 import com.wycaca.threadPoolFactory.NamedThreadPoolFactory;
 import lombok.Data;
@@ -95,13 +94,13 @@ public class RegisterCenterService {
             logger.info("注册中心启动成功, 端口号: {}", Const.REGISTER_PORT);
             // 持续监听 服务 socket
             while (true) {
-                // 心跳检测线程池
-                logger.info("注册中心 心跳检测线程池 已启动");
-                // 一定时间后启动, 然后间隔一定时间重复执行
-                KEEP_ALIVE_EXECUTOR.scheduleWithFixedDelay(new KeepAliveTask(this), Const.SCAN_TIME, Const.SCAN_TIME, TimeUnit.SECONDS);
+                // todo 心跳检测线程池
+//                logger.info("注册中心 心跳检测线程池 已启动");
+//                // 一定时间后启动, 然后间隔一定时间重复执行
+//                KEEP_ALIVE_EXECUTOR.scheduleWithFixedDelay(new KeepAliveTask(this), Const.SCAN_TIME, Const.SCAN_TIME, TimeUnit.SECONDS);
                 // 服务发现线程池
-                logger.info("注册中心 服务发现线程池 已启动");
-                REGISTER_EXECUTOR.execute(new ServiceRegisterTask(serverSocket.accept()));
+                logger.info("注册中心 服务发现线程池 启动");
+                REGISTER_EXECUTOR.execute(new ServiceRegisterTask(this, serverSocket.accept()));
             }
         } finally {
             serverSocket.close();

@@ -21,8 +21,8 @@ public class ServiceRegisterTask implements Runnable {
     private final ConnectFactory connectService;
     private final CommonSerializer commonSerializer;
 
-    public ServiceRegisterTask(Socket socket) throws IOException {
-        registerCenterService = new RegisterCenterService();
+    public ServiceRegisterTask(RegisterCenterService registerCenterService, Socket socket) throws IOException {
+        this.registerCenterService = registerCenterService;
         // 连接上提供者的Socket服务器
         connectService = new SocketImpl(socket);
         commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
@@ -30,7 +30,7 @@ public class ServiceRegisterTask implements Runnable {
 
     @Override
     public void run() {
-        // 持续监听socket, 接受各种消息
+        // 持续监听socket, 接受注册消息
         String url = "";
         try (InputStream inputStream = connectService.getInput();
              OutputStream outputStream = connectService.getOutPut();
@@ -43,10 +43,12 @@ public class ServiceRegisterTask implements Runnable {
                 while ((len = inputStream.read(bytesBuffer)) != -1) {
                     byteArrayOutputStream.write(bytesBuffer, 0, len);
                 }
+                // 反序列 注册url
                 url = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
                 RegisterResponse response = registerCenterService.register(url);
-                outputStream.write(commonSerializer.serialize(response));
-                outputStream.flush();
+                // todo 返回消息
+//                outputStream.write(commonSerializer.serialize(response));
+//                outputStream.flush();
             }
         } catch (IOException e) {
             logger.error("注册中心注册服务失败, ", e);

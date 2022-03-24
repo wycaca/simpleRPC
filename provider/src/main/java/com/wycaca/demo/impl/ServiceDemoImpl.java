@@ -8,6 +8,7 @@ public class ServiceDemoImpl implements ServiceDemo {
     private static final Logger logger = LoggerFactory.getLogger(ServiceDemo.class);
 
     public void sayHello(String name) {
+        System.out.println("hi, " + name);
         logger.info("hi, {}", name);
     }
 }

@@ -1,10 +1,10 @@
 package com.wycaca.model;
 
+import com.wycaca.connect.ConnectFactory;
+import com.wycaca.connect.impl.SocketFactory;
 import com.wycaca.constant.Const;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.serializer.CommonSerializer;
-import com.wycaca.service.ConnectFactory;
-import com.wycaca.service.impl.SocketImpl;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;
@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -26,6 +27,7 @@ public class RegisterService {
     protected URL url;
     protected Long registerTimestamp;
     protected Long lastPingTimestamp;
+    protected Socket registerSocket;
 
     protected CommonSerializer commonSerializer;
 
@@ -54,17 +56,17 @@ public class RegisterService {
      */
     public RegisterResponse doRegister(String registerIp, int registerPort) {
         // 开启客户端, 连接注册中心的服务器Socket
-        ConnectFactory connectFactory = null;
-
+        ConnectFactory connectService = null;
         try {
-            connectFactory = new SocketImpl(new Socket(registerIp, registerPort));
+            registerSocket = new Socket(registerIp, registerPort);
+            connectService = new SocketFactory(registerSocket);
         } catch (IOException e) {
             logger.error("连接注册中心失败, ", e);
             return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "连接注册中心失败");
         }
 
-        try (OutputStream outputStream = connectFactory.getOutPut();
-//             InputStream inputStream = null;
+        try (InputStream inputStream = connectService.getSocket().getInputStream();
+             OutputStream outputStream = connectService.getSocket().getOutputStream();
 //             ByteArrayOutputStream byteArrayOutputStream = null;
         ) {
             // 向注册中心发送注册Url

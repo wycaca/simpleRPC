@@ -14,7 +14,6 @@ public class ConsumerApp {
 
     public static void main(String[] args) {
         try {
-            ServiceDemo serviceDemo;
             ConsumerService consumerService = new ConsumerService(8100, ServiceDemo.class);
             // 注册
             RegisterResponse response = consumerService.doRegister("127.0.0.1", Const.REGISTER_PORT);
@@ -23,6 +22,8 @@ public class ConsumerApp {
             } else {
                 logger.error("消费者注册失败, 错误码: {},{}", response.getCode(), response.getMessage());
             }
+            ServiceDemo serviceDemo = consumerService.getRemoteProxyClazz(ServiceDemo.class);
+            serviceDemo.sayHello("wycaca");
         } catch (IOException e) {
             logger.error("消费者服务异常, ", e);
         }

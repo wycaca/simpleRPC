@@ -31,4 +31,9 @@ public interface Const {
     public static final String PARAMS_TIMESTAMP = "timestamp";
     public static final String PARAMS_METHODS = "methods";
     public static final String PARAMS_INTERFACE = "interface";
+
+    /**
+     * invoke 方法名
+     */
+    public static final String PARAMS_METHOD = "method";
 }

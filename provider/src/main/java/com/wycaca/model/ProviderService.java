@@ -78,15 +78,10 @@ public class ProviderService extends RegisterService {
     private void start(int port) throws IOException {
         serverSocket = new ServerSocket();
         serverSocket.bind(new InetSocketAddress(port));
-        // 开始监听
-        serverSocket.accept();
         while (true) {
-            logger.info("服务{} 生产者启动成功, 端口号: {}", this.url.getPath(), port);
-            // todo 获取方法名和入参
-            String method = "";
-            Object param = null;
+            logger.info("服务{} 提供者启动成功, 端口号: {}", this.url.getPath(), port);
             // 持续接受消费者消息, 提供服务
-            workExecutor.execute(new WorkTask(method, param));
+            workExecutor.execute(new WorkTask(serverSocket.accept()));
         }
     }
 }

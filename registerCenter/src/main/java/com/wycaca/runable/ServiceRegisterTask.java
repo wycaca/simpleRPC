@@ -3,9 +3,7 @@ package com.wycaca.runable;
 import com.wycaca.constant.Const;
 import com.wycaca.model.response.RegisterResponse;
 import com.wycaca.serializer.CommonSerializer;
-import com.wycaca.service.ConnectFactory;
 import com.wycaca.service.RegisterCenterService;
-import com.wycaca.service.impl.SocketImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,13 +16,14 @@ import java.net.Socket;
 public class ServiceRegisterTask implements Runnable {
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegisterTask.class);
     private final RegisterCenterService registerCenterService;
-    private final ConnectFactory connectService;
+    private Socket socket;
     private final CommonSerializer commonSerializer;
 
     public ServiceRegisterTask(RegisterCenterService registerCenterService, Socket socket) throws IOException {
         this.registerCenterService = registerCenterService;
-        // 连接上提供者的Socket服务器
-        connectService = new SocketImpl(socket);
+        // 获取连接服务, 接受消息
+//        connectService = new SocketFactory(socket);
+        socket = socket;
         commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
     }
 
@@ -32,21 +31,21 @@ public class ServiceRegisterTask implements Runnable {
     public void run() {
         // 持续监听socket, 接受注册消息
         String url = "";
-        try (InputStream inputStream = connectService.getInput();
-             OutputStream outputStream = connectService.getOutPut();
+        try (InputStream inputStream = socket.getInputStream();
+             OutputStream outputStream = socket.getOutputStream();
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ) {
             byte[] bytesBuffer = new byte[1024];
             int len = -1;
             // BIO方式
-            while ((len = inputStream.read(bytesBuffer)) != -1) {
+            while ((len = inputStream.read(bytesBuffer)) > 0) {
                 byteArrayOutputStream.write(bytesBuffer, 0, len);
                 // 反序列 注册url
                 url = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), String.class);
                 RegisterResponse response = registerCenterService.register(url);
-                // todo 返回消息
-//                outputStream.write(commonSerializer.serialize(response));
-//                outputStream.flush();
+                // 返回消息
+                outputStream.write(commonSerializer.serialize(response));
+                outputStream.flush();
             }
         } catch (IOException e) {
             logger.error("注册中心注册服务失败, ", e);

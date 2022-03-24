@@ -32,15 +32,25 @@ public class ConsumerService extends RegisterService {
      */
     @Override
     public RegisterResponse doRegister(String registerIp, int registerPort) {
-        super.doRegister(registerIp, registerPort);
         // 如果是消费者, 需要接受返回信息
+        // 开启客户端, 连接注册中心的服务器Socket
         ConnectFactory connectService = null;
+        try {
+            registerSocket = new Socket(registerIp, registerPort);
+            connectService = new SocketFactory(registerSocket);
+        } catch (IOException e) {
+            logger.error("连接注册中心失败, ", e);
+            return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "连接注册中心失败");
+        }
         RegisterResponse response = new RegisterResponse();
-        connectService = new SocketFactory(registerSocket);
         try (InputStream inputStream = connectService.getInput();
              OutputStream outputStream = connectService.getOutPut();
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         ) {
+            // 向注册中心发送注册Url
+            outputStream.write(commonSerializer.serialize(getRegisterUrl()));
+            outputStream.flush();
+
             byte[] bytesBuffer = new byte[1024];
             int len = -1;
             // BIO方式
@@ -48,16 +58,17 @@ public class ConsumerService extends RegisterService {
                 byteArrayOutputStream.write(bytesBuffer, 0, len);
                 // 反序列 注册url
                 response = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), RegisterResponse.class);
+                // 获取返回结果, 判断是否有可有提供者, 注册中心返回一个提供者, 双方建立连接
+                if (response.isOk()) {
+                    String data = (String) response.getData();
+                    doSubscribe(data.split(":")[0], Integer.parseInt(data.split(":")[1]));
+                    return RegisterResponse.ok();
+                }
             }
         } catch (IOException e) {
             logger.error("消费者注册失败", e);
         }
-        // 获取返回结果, 判断是否有可有提供者, 注册中心返回一个提供者, 双方建立连接
-        if (response.isOk()) {
-            String data = (String) response.getData();
-            doSubscribe(data.split(":")[0], Integer.parseInt(data.split(":")[1]));
-            return RegisterResponse.ok();
-        }
+
         return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "消费者注册失败");
     }
 

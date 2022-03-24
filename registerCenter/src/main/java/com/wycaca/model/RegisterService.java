@@ -83,7 +83,6 @@ public class RegisterService {
         } catch (IOException e) {
             logger.error("向注册中心注册失败, ", e);
         }
-//        RegisterResponse result = commonSerializer.deserialize(byteArrayOutputStream.toByteArray(), RegisterResponse.class);
         return RegisterResponse.ok();
     }
 

@@ -56,32 +56,32 @@ public class RegisterCenterService {
         }
         // 区分提供者, 消费者
         // 如果是提供者加入注册服务
-        if (Const.PROVIDER.equals(registerService.getType())) {
+        if (Const.PROVIDER.equals(registerService.getUrl().getProtocol())) {
             // 已存在, 则更新 心跳时间
-            if (PROVIDER_PATH_MAP.containsKey(registerService.getPath())) {
-                registerService = PROVIDER_PATH_MAP.get(registerService.getPath()).get(registerService.getRegisterUrl());
+            if (PROVIDER_PATH_MAP.containsKey(registerService.getUrl().getPath())) {
+                registerService = PROVIDER_PATH_MAP.get(registerService.getUrl().getPath()).get(registerService.getRegisterUrl());
                 registerService.setLastPingTimestamp(System.currentTimeMillis());
             }
             PROVIDER_MAP.put(registerService.getRegisterUrl(), registerService);
-            PROVIDER_PATH_MAP.put(registerService.getPath(), PROVIDER_MAP);
-            logger.info("生产者服务: {}, 注册/心跳成功, class path: {}", registerService.getName(), registerService.getPath());
+            PROVIDER_PATH_MAP.put(registerService.getUrl().getPath(), PROVIDER_MAP);
+            logger.info("生产者服务: {}, 注册/心跳成功, class path: {}", registerService.getUrl().getPath(), registerService.getUrl().getPath());
             return RegisterResponse.ok();
         }
         // 如果是消费者, 查找提供者
-        else if (Const.CONSUMER.equals(registerService.getType())) {
+        else if (Const.CONSUMER.equals(registerService.getUrl().getProtocol())) {
             // 如果有对应的提供者, 返回socket连接信息, 使提供者和消费者直接建立连接
-            if (CONSUMER_PATH_MAP.containsKey(registerService.getPath())) {
+            if (CONSUMER_PATH_MAP.containsKey(registerService.getUrl().getPath())) {
                 // 选择一个生产者, 目前直接随机
                 // todo 完善负载均衡策略
-                RegisterService providerService = loadSelector.select(PROVIDER_PATH_MAP.get(registerService.getPath()));
+                RegisterService providerService = loadSelector.select(PROVIDER_PATH_MAP.get(registerService.getUrl().getPath()));
                 // 注册消费者
                 CONSUMER_MAP.put(registerService.getRegisterUrl(), registerService);
-                CONSUMER_PATH_MAP.put(registerService.getPath(), CONSUMER_MAP);
-                logger.info("消费者服务: {}, 注册成功", registerService.getPath());
-                return RegisterResponse.ok(providerService.getIp() + ":" + providerService.getPort());
+                CONSUMER_PATH_MAP.put(registerService.getUrl().getPath(), CONSUMER_MAP);
+                logger.info("消费者服务: {}, 注册成功", registerService.getUrl().getPath());
+                return RegisterResponse.ok(providerService.getUrl().getHost() + ":" + providerService.getUrl().getPort());
             } else {
                 // 没有, 直接返回错误信息
-                return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "未找到可用生产者, " + registerService.getName());
+                return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "未找到可用生产者, " + registerService.getUrl().getPath());
             }
         } else {
             return RegisterResponse.fail(HttpStatus.INTERNAL_SERVER_ERROR.value(), "注册服务类型错误");

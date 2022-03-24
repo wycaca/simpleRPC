@@ -1,12 +1,15 @@
 package com.wycaca.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
 @Data
+@NoArgsConstructor
 public class URL implements Serializable {
     /**
      * 协议类型
@@ -56,7 +59,54 @@ public class URL implements Serializable {
                 params.put(paramStr.split("=")[0], paramStr.split("=")[1]);
             }
         }
+    }
 
+    public URL addParam(String key, String value) {
+        // key, value都不为Null和空字符
+        if (StringUtils.isEmpty(key) || StringUtils.isEmpty(value)) {
+            return this;
+        }
+        if (params == null || params.isEmpty()) {
+            params = new HashMap<>();
+        } else {
+            params = new HashMap<>(params);
+        }
+        // 已有key且相同value
+        if (value.equals(params.get(key))) {
+            return this;
+        }
+        params.put(key, value);
+        return this;
+    }
+
+    public URL removeParam(String key) {
+        if (StringUtils.isEmpty(key)) {
+            return this;
+        }
+        if (params == null || params.isEmpty()) {
+            params = new HashMap<>();
+        } else {
+            params = new HashMap<>(params);
+        }
+        if (!params.containsKey(key)) {
+            return this;
+        }
+        params.remove(key);
+        return this;
+    }
+
+    public String getParamsStr() {
+        if (this.getParams().isEmpty()) {
+            return "";
+        }
+        StringBuilder paramBuilder = new StringBuilder();
+        paramBuilder.append("?");
+        for (Map.Entry<String, String> param : this.getParams().entrySet()) {
+            paramBuilder.append(param.getKey()).append("=").append(param.getValue()).append("&");
+        }
+        // 去除最后一位 &
+        paramBuilder.deleteCharAt(paramBuilder.length() - 1);
+        return paramBuilder.toString();
     }
 
 //    public static void main(String[] args) {

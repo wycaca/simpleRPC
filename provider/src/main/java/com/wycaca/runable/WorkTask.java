@@ -23,7 +23,7 @@ public class WorkTask implements Runnable {
     private final ConnectFactory connectService;
     private final CommonSerializer commonSerializer;
 
-    public WorkTask(Socket socket) throws IOException {
+    public WorkTask(Socket socket) {
         // 获取socket连接, 接受消息
         connectService = new SocketFactory(socket);
         commonSerializer = CommonSerializer.getSerializer(Const.KRYO);
